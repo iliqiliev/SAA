@@ -41,7 +41,8 @@ def main():
 
     # None means empty space, bool indicates if there is a radio transmitter
     for position in building_positions:
-        buildings_map[position] = False
+        if position >= 0:
+            buildings_map[position] = False
 
     print(coverage(buildings_map, transmitter_range))
 
