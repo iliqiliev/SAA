@@ -3,23 +3,31 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
+needed_harmonics_count = 5
 amplitude = 1  # 1 волт
 period = 10 * 2e-6  # 20 µs
-duty_cycle = 1 / 3  # 33.3%
-needed_harmonics_count = 5
+duty_cycle = 1 / 3 * period  # 33.3% от периода
 
-frequency = round(1 / period)
+frequency = round(1 / period + 0.5)
 sampling_rate = frequency * 2
 
+
 # Подготвяне на сигнала
-sample_times = np.linspace(start=0, stop=1, num=sampling_rate, endpoint=False)
+sample_times = np.linspace(
+    start=0,
+    stop=period,
+    num=sampling_rate,
+    endpoint=False
+)
 
 signal = amplitude * signal.square(
     2 * np.pi * sample_times,
     duty=duty_cycle
 )
 
-plt.figure(figsize=(18, 7))
+# Дефиниране на прозореца, който показва графиките
+plt.figure("Курсова работа", figsize=(18, 7))
+plt.suptitle("Илия Илиев №111222012")
 
 # Чертаене на сигнала
 plt.subplot(1, 2, 1)
@@ -33,33 +41,43 @@ plt.title('S(t)')
 # Форматиране за красота
 plt.axhline(y=0, color='black')
 plt.axvline(x=0, color='gray', linestyle='--')
-plt.axvline(x=1, color='gray', linestyle='--')
+plt.axvline(x=period, color='gray', linestyle='--')
 plt.grid(True)
 
-# Подготвяне на данните за АЧС
+# Подготвяне на данните за АЧС:
 discrete_count = len(sample_times)
+
 fourier_transform = np.fft.fft(signal) / discrete_count
 
-spacing = sample_times[1] - sample_times[0]
-frequencies = np.fft.fftfreq(discrete_count, d=spacing)
+frequencies = np.fft.fftfreq(
+    discrete_count,
+    d=sample_times[1] - sample_times[0]
+)
 
-# Спектъра е симетричен, запазваме само едната страна
-fourier_transform = fourier_transform[frequencies >= 0]
-frequencies = frequencies[frequencies >= 0]
+# Прилагаме маска за подобряване на бързодействието при чертаенето
+# Може да се закоментира за разглеждане на целия спектър
+mask = np.logical_and(
+    frequencies >= 0,
+    frequencies <= needed_harmonics_count * frequency
+)
+
+fourier_transform = fourier_transform[mask]
+frequencies = frequencies[mask]
 
 # Чертаене на АЧС
 plt.subplot(1, 2, 2)
 _, _, baseline = plt.stem(frequencies, np.abs(fourier_transform))
 
 # Означаване на осите
-plt.xlabel('ω [rad/s]')
+plt.xlabel('f [Hz]')
 plt.ylabel('A [V]')
 plt.title('АЧС')
 
 # Форматиране за красота
+padding = 0.2 * frequency
 plt.setp(baseline, visible=False)
 plt.axhline(y=0, color='black')
-plt.xlim(-0.5, needed_harmonics_count + 0.5)
+plt.xlim(-padding, needed_harmonics_count * frequency + padding)
 plt.grid(True)
 
 # Показване на екрана
