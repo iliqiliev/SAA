@@ -3,7 +3,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
-needed_harmonics_count = 5
+harmonics_count = 5
 amplitude = 1  # 1 волт
 period = 10 * 2e-6  # 20 µs
 duty_cycle = 1 / 3 * period  # 33.3% от периода
@@ -58,7 +58,7 @@ frequencies = np.fft.fftfreq(
 # Може да се закоментира за разглеждане на целия спектър
 mask = np.logical_and(
     frequencies >= 0,
-    frequencies <= needed_harmonics_count * frequency
+    frequencies <= harmonics_count * frequency
 )
 
 fourier_transform = fourier_transform[mask]
@@ -77,7 +77,7 @@ plt.title('АЧС')
 padding = 0.2 * frequency
 plt.setp(baseline, visible=False)
 plt.axhline(y=0, color='black')
-plt.xlim(-padding, needed_harmonics_count * frequency + padding)
+plt.xlim(-padding, harmonics_count * frequency + padding)
 plt.grid(True)
 
 # Показване на екрана
