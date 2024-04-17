@@ -26,7 +26,7 @@ signal = amplitude * signal.square(
 )
 
 # Дефиниране на прозореца, който показва графиките
-plt.figure("Курсова работа", figsize=(18, 7))
+plt.figure("Курсова задача", figsize=(18, 7))
 plt.suptitle("Илия Илиев №111222012")
 
 # Чертаене на сигнала
